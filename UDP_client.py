@@ -1,10 +1,14 @@
 '''
 	udp socket client
 	Silver Moon
+	sender
 '''
 
 import socket	#for sockets
 import sys	#for exit
+from check import ip_checksum
+#use it in this way
+
 
 # create dgram udp socket
 try:
@@ -15,13 +19,19 @@ except socket.error:
 
 host = 'localhost';
 port = 8888;
+seqnum = "0"	#sequence number
+
 
 while(1) :
 	msg = raw_input('Enter message to send : ')
-	
+
+	chks = ip_checksum(msg)
+	data = ( seqnum + chks + msg)
 	try :
 		#Set the whole string
-		s.sendto(msg, (host, port))
+		#s.sendto(msg, (host, port))
+		s.sendto(data, (host, port))
+		
 		
 		# receive data from client (data, addr)
 		d = s.recvfrom(1024)

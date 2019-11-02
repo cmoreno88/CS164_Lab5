@@ -1,5 +1,6 @@
 '''
 	Simple udp socket server
+	reciever
 '''
 
 import socket
