@@ -24,7 +24,7 @@ seqnum = "0"  # sequence number
 while(1) :
 	msg = raw_input('Enter message to send : ')
 
-	chks = ip_checksum(msg)
+	chks = str(ip_checksum(msg))
 	data = (seqnum + chks + msg)
 	try :
 		# Set the whole string
