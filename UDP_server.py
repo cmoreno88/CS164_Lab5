@@ -8,6 +8,7 @@ import sys
 
 HOST = ''	# Symbolic name meaning all available interfaces
 PORT = 8888	# Arbitrary non-privileged port
+ack = 0
 
 # Datagram (udp) socket
 try :
@@ -30,16 +31,33 @@ print 'Socket bind complete'
 #now keep talking with the client
 while 1:
 	# receive data from client (data, addr)
-	d = s.recvfrom(1024)
-	data = d[0]
-	addr = d[1]
+	d = s.recvfrom(1024)		# Need to pull the seqnum and the checksum value
+	seqnum = d[0]
+	chks = d[1:3]
+	data = d[3]
+	addr = d[4]
 	
 	if not data: 
 		break
-	
-	reply = 'OK...' + data
-	
-	s.sendto(reply , addr)
+	elif seqnum == str(acknum):
+		print 'Ack Good'
+		rchks = str(ip_checksum(data))		# may need d[3:]
+		if chks == rchks:
+			print 'Sum Good'
+			reply = 'OK...' + str(acknum) + data
+			s.sendto(reply , addr)
+		else:
+			print 'Sum Bad'
+		if acknum == 0:						# MAY need to move this assignment
+			acknum = 1
+		else:
+			acknum = 0
+	else:
+		print 'Ack Bad'
+		reply = 'OK...' + data
+		s.sendto(reply , addr)
+	#reply = 'OK...' + data
+	#s.sendto(reply , addr)
 	print 'Message[' + addr[0] + ':' + str(addr[1]) + '] - ' + data.strip()
 	
 s.close()
