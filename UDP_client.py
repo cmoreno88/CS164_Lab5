@@ -7,6 +7,7 @@
 import socket	#for sockets
 import sys	#for exit
 from check import ip_checksum
+import time
 # use it in this way
 #https://www.bogotobogo.com/python/Multithread/python_multithreading_subclassing_Timer_Object.php
 # create dgram udp socket
@@ -21,37 +22,47 @@ host = 'localhost';
 port = 8888;
 seqnum = 0  # sequence number
 
+msg = raw_input('Enter message to send : ')
+chks = str(ip_checksum(msg))					#convert checksum return value to string
+data = (str(seqnum) + chks + msg)
+s.sendto(data, (host, port))
 
 while(1) :
 	msg = raw_input('Enter message to send : ')
 
-	chks = str(ip_checksum(msg))					#convert checksum return value to string
-	data = (str(seqnum) + chks + msg)				#all 3 values are strings and merged together
+	#chks = str(ip_checksum(msg))					#convert checksum return value to string
+	#data = (str(seqnum) + chks + msg)				#all 3 values are strings and merged together
 	try :
 		# Set the whole string
 		# s.sendto(msg, (host, port))
-		s.sendto(data, (host, port))
+		# s.sendto(data, (host, port))
 
 		# receive data from client (data, addr)
 		d = s.recvfrom(1024)
-		acknum = d[0]
-		reply = d[1]
-		addr = d[2]
-		
-		#check for ack
-		if acknum == str(seqnum):
-			print 'Good ack'
+		reply = d[0]
+		addr = d[1]
+		acknum = reply[0]								#we are recieving the acknowledge number
+		rchks = reply[1:3]
+		compchks = str(ip_checksum(reply[3:]))
+		#check for ack		# receive data from client (data, addr)
+		if not data: 
+			break
+		elif (str(seqnum) == acknum) and (rchks == compchks):		# verify seqnum/acknum and seqnum If good flip values
+			newdata = 'clientAck and Sum Good'
 			if seqnum == 0:
 				seqnum = 1
 			else:
 				seqnum = 0
+			# MAY need to move this assignment
+			reply = (str(seqnum) + str(ip_checksum(newdata)) + newdata)
+			#s.sendto(reply, (host, port))
+			print 'Server reply : ' + newdata
 		else:
-			print 'Bad ack'
-			s.sendto(data, (host, port))
-			
-			 
-		print 'Server reply : ' + reply
-	
+			print 'clientAck and Sum Bad'
+			reply = (str(seqnum) + chks + msg)
+			#s.sendto(reply, (host, port))
+			print 'Server reply : ' + msg
+		s.sendto(reply, (host, port))
 	except socket.error, msg:
 		print 'Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
 		sys.exit()
