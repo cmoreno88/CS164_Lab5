@@ -44,7 +44,7 @@ while(1) :
 		acknum = reply[0]								#we are recieving the acknowledge number
 		rchks = reply[1:3]
 		compchks = str(ip_checksum(reply[3:]))
-		#check for ack		# receive data from client (data, addr)
+		#check for ack, receive data from client (data, addr)
 		if not data: 
 			break
 		elif (str(seqnum) == acknum) and (rchks == compchks):		# verify seqnum/acknum and seqnum If good flip values
