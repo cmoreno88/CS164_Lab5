@@ -3,11 +3,13 @@
 	Silver Moon
 	sender
 '''
-
+# https://www.programiz.com/python-programming/time
+# https://www.geeksforgeeks.org/time-functions-in-python-set-1-time-ctime-sleep/
 import socket	#for sockets
 import sys	#for exit
 from check import ip_checksum
 import time
+import threading
 # use it in this way
 #https://www.bogotobogo.com/python/Multithread/python_multithreading_subclassing_Timer_Object.php
 # create dgram udp socket
