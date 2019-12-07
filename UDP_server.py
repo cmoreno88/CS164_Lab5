@@ -11,6 +11,7 @@ import time
 HOST = ''	# Symbolic name meaning all available interfaces
 PORT = 8888	# Arbitrary non-privileged port
 acknum = 0	# Created for acknowledgement number
+window = [0,1,0,1]	# window initialization
 
 # Datagram (udp) socket
 try :
@@ -27,12 +28,12 @@ try:
 except socket.error , msg:
 	print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
 	sys.exit()
-	
 print 'Socket bind complete'
+
 
 #now keep talking with the client
 while 1:
-	print 'loop check'						# receive data from client (data, addr)
+#	print 'loop check'						# receive data from client (data, addr)
 	d = s.recvfrom(1024)		# Need to pull the seqnum and the checksum value
 	data = d[0]
 	addr = d[1]
@@ -47,6 +48,7 @@ while 1:
 		reply = (str(acknum) + str(ip_checksum(data)) + data)
 		if acknum == 0:
 			acknum = 1
+			window.swapcase
 		else:
 			acknum = 0
 	else:
